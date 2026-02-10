@@ -25,13 +25,14 @@ Este proyecto es una implementación minimalista de Llama 2 en C y Python, basad
 
 ### 1. Descargar Modelo (.pt)
 ```cmd
-mkdir out15M
-curl -L https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt -o out15M/stories15M.pt
+mkdir data
+
+curl -L https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt -o data/stories15M.pt
 ```
 
 ### 2. Ejecutar Inferencia
 ```cmd
-python sample.py --checkpoint=out15M/stories15M.pt --start="Once upon a time"
+python sample.py --checkpoint=data/stories15M.pt --start="Once upon a time"
 ```
 
 
@@ -40,11 +41,10 @@ python sample.py --checkpoint=out15M/stories15M.pt --start="Once upon a time"
 ### 1. Descargar Modelo y Tokenizer
 ```cmd
 :: Crear carpetas
-mkdir out260K
 mkdir data
 
 :: Descargar modelo .pt
-curl -L https://huggingface.co/karpathy/tinyllamas/resolve/main/stories260K/stories260K.pt -o out260K/stories260K.pt
+curl -L https://huggingface.co/karpathy/tinyllamas/resolve/main/stories260K/stories260K.pt -o data/stories260K.pt
 
 :: Descargar tokenizer personalizado (REQUERIDO para 260K)
 curl -L https://huggingface.co/karpathy/tinyllamas/resolve/main/stories260K/tok512.model -o data/tok512.model
@@ -52,5 +52,5 @@ curl -L https://huggingface.co/karpathy/tinyllamas/resolve/main/stories260K/tok5
 
 ### 2. Ejecutar
 ```cmd
-python sample.py --checkpoint=out260K/stories260K.pt --start="Once_upon_a_time"
+python sample.py --checkpoint=data/stories260K.pt --start="Once_upon_a_time"
 ```
