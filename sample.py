@@ -35,7 +35,7 @@ ptdtype = {'float32': torch.float32, 'bfloat16': torch.bfloat16, 'float16': torc
 ctx = nullcontext() if device_type == 'cpu' else torch.amp.autocast(device_type=device_type, dtype=ptdtype)
 
 # init from a model saved in a specific directory
-checkpoint_dict = torch.load(checkpoint, map_location=device)
+checkpoint_dict = torch.load(checkpoint, map_location=device, weights_only=False)
 gptconf = ModelArgs(**checkpoint_dict['model_args'])
 model = Transformer(gptconf)
 state_dict = checkpoint_dict['model']
