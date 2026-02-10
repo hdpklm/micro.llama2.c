@@ -18,6 +18,7 @@ Este proyecto es una implementación minimalista de Llama 2 en C y Python, basad
 ## Tareas Pendientes
 - [x] Corregir la carga de checkpoints en `sample.py`.
 - [x] Descargar un modelo válido (`.pt`) y probar inferencia.
+- [x] Configurar entorno para `stories260K.pt` (descarga de modelo y tokenizer tok512).
 - [ ] Configurar compilador GCC/MSVC para la versión de C (`run.c`).
 
 ## Instrucciones de Instalación y Uso (Python)
@@ -31,4 +32,25 @@ curl -L https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.pt -o
 ### 2. Ejecutar Inferencia
 ```cmd
 python sample.py --checkpoint=out15M/stories15M.pt --start="Once upon a time"
+```
+
+
+## Instrucciones para stories260K (Pruebas ESP32)
+
+### 1. Descargar Modelo y Tokenizer
+```cmd
+:: Crear carpetas
+mkdir out260K
+mkdir data
+
+:: Descargar modelo .pt
+curl -L https://huggingface.co/karpathy/tinyllamas/resolve/main/stories260K/stories260K.pt -o out260K/stories260K.pt
+
+:: Descargar tokenizer personalizado (REQUERIDO para 260K)
+curl -L https://huggingface.co/karpathy/tinyllamas/resolve/main/stories260K/tok512.model -o data/tok512.model
+```
+
+### 2. Ejecutar
+```cmd
+python sample.py --checkpoint=out260K/stories260K.pt --start="Once_upon_a_time"
 ```

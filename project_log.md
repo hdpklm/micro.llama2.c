@@ -19,5 +19,13 @@
 - **Resultado**: El script `sample.py` generó texto correctamente: *"Once upon a time, there was a little girl named Lily..."*.
 - **Estado**: La versión de Python está operativa.
 
+## 📝 Registro: v1.3 - Resolución de stories260K.pt
+- **Fallo**: `AssertionError: data\tok512.model` e `IndexError`.
+- **Causa**: 
+    1. El modelo `stories260K` tiene un vocabulario de solo 512 tokens.
+    2. Intentar usar el tokenizer de Llama2 (32,000 tokens) causa un error de índice en la capa de embeddings.
+- **Solución**: Se descargó el archivo `tok512.model` en la carpeta `data/`.
+- **Resultado**: Inferencia exitosa con el modelo mini para pruebas.
+
 # Backup
 *(Aquí se guardarán ideas descartadas o versiones anteriores en el futuro)*
