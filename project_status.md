@@ -5,6 +5,24 @@ Este proyecto es una implementación minimalista de Llama 2 en C y Python. El ob
 
 ---
 
+## 📂 Gestión de Datos: Train vs Validation
+
+El proyecto utiliza un sistema de **Shards** (fragmentos) para cargar datos. La lógica de separación en `tinystories.py` es estrictamente alfabética:
+
+1. El script busca todos los archivos `.bin` y los **ordena alfabéticamente** (`sorted`).
+2. **Shard 0** (el primer archivo): Se usa para **Validation** (test).
+3. **Shards 1 en adelante**: Se usan para **Train** (entrenamiento).
+
+### Nomenclatura Recomendada
+Para garantizar que el modelo use los archivos correctos, usa prefijos numéricos:
+- `00_val.json` → Se convertirá en el archivo de test (Shard 0).
+- `01_train.json` → Primer archivo de entrenamiento (Shard 1).
+- `02_train.json` ...
+
+**Nota sobre el Sistema de Archivos**: Aunque Windows o Linux almacenen archivos en un orden interno, el código de este proyecto usa la función `sorted()` de Python, por lo que **el nombre manda siempre sobre el orden de creación.**
+
+---
+
 ## 🛠️ Preparación del Dataset
 
 El dataset debe estar en `data/TinyStories_all_data/custom_data.json` con el formato:
@@ -82,6 +100,14 @@ Para evitar errores de parsing en la consola de Windows:
 :: Ejemplo Inferencia 260K
 python sample.py --checkpoint=data/stories260K.pt --start="Instruction:_Hola_quien_eres?_Response:"
 ```
+
+---
+
+## Tareas Pendientes
+- [x] Corregir la carga de checkpoints en `sample.py`.
+- [x] Descargar un modelo válido (`.pt`) y probar inferencia.
+- [x] Configurar entorno para `stories260K.pt` (split Train/Val y Fine-tuning).
+- [ ] Configurar compilador GCC/MSVC para la versión de C (`run.c`).
 
 ---
 

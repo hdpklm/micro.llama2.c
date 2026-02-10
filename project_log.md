@@ -59,5 +59,15 @@
 - **Añadido**: Comandos de entrenamiento "desde cero" con parámetros exactos para recrear el tamaño 260K.
 - **Añadido**: Tabla Comparativa de parámetros y requisitos de hardware.
 
+## 📝 Registro: v1.9 - Explicación de Train/Validation Split
+- **Añadido**: Explicación técnica en `project_status.md` sobre cómo el script usa `sorted()` para asignar el Shard 0 a validación.
+- **Recomendación**: Uso de prefijos numéricos (`00_val`, `01_train`) para controlar el flujo de datos sin depender del sistema de archivos.
+- **Razón**: El usuario tenía dudas sobre cómo el sistema diferenciaba entre entrenamiento y test, y si intervenía el orden de creación del archivo.
+
+## 📝 Registro: v1.10 - Implementación de Shards y Prueba de Fine-tuning
+- **Cambio**: Se dividió el dataset en `00_val.json` (test) y `01_train.json` (entrenamiento).
+- **Éxito**: El script `train.py` ejecutó correctamente un ciclo de entrenamiento (10 iters) usando `stories260K.pt` como base.
+- **Validación**: Se confirmó que el modelo separa los Shards correctamente (el log mostró pérdidas diferentes para train y val).
+
 # Backup
 *(Aquí se guardarán ideas descartadas o versiones anteriores en el futuro)*
