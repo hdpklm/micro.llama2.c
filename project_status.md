@@ -115,3 +115,74 @@ python sample.py --checkpoint=data/stories260K.pt --start="Instruction:_Hola_qui
 - **Index out of range**: Mismatch entre `vocab_size` pretokenizado y el del entrenamiento.
 - **AssertionError: No bin files found**: Asegúrate de tener al menos 2 archivos `.bin` en la carpeta `tokN`.
 - **FileNotFoundError 'Cul'**: No uses caracteres especiales o espacios libres en los comandos de Windows.
+
+
+# Guía Definitiva: Fine-Tuning Modelo 260K (ESP32)
+
+Esta guía contiene los pasos y comandos probados para entrenar el modelo ultraligero (260K parámetros) con tu propio dataset.
+
+## 1. Estructura de Datos (Obligatorio)
+Para que el entrenamiento funcione, necesitas **dos archivos** (uno para test, otro para training) pretokenizados en la carpeta correcta.
+
+### Paso A: Crear los JSON
+Crea estos dos archivos en `data/TinyStories_all_data/`:
+1. **`00_val.json`** (Test): Pon aquí 2 o 3 ejemplos.
+2. **`01_train.json`** (Entrenamiento): Pon aquí el resto de tus datos.
+*Formato:* `[{"story": "Instruction: ... Response: ..."}]`
+
+### Paso B: Pretokenizar (Vocabulario 512)
+Ejecuta este comando para generar los archivos binarios:
+```cmd
+python tinystories.py pretokenize --vocab_size=512
+```
+*Verifica que en `data/tok512/` se hayan creado `00_val.bin` y `01_train.bin`.*
+
+---
+
+## 2. Preparar el Modelo Base
+Debes tener el modelo base en la carpeta de salida para "resumir" el entrenamiento desde ahí.
+```cmd
+mkdir out
+copy data\stories260K.pt out\ckpt.pt
+```
+
+---
+
+## 3. COMANDO DE ENTRENAMIENTO (Probado)
+Este comando está ajustado para datasets pequeños (para evitar errores de memoria o índice).
+
+**Ejecutar:**
+```cmd
+python train.py --init_from="resume" --vocab_source="custom" --vocab_size=512 --batch_size=1 --gradient_accumulation_steps=16 --max_seq_len=64 --max_new_iters=100 --eval_interval=5 --learning_rate=5e-4 --decay_lr=False --always_save_checkpoint=True
+```
+
+### Explicación de Parámetros Clave:
+- `--init_from="resume"`: Carga el cerebro del modelo 260K.
+- `--max_new_iters=100`: Entrena 100 pasos nuevos obligatoriamente.
+- `--always_save_checkpoint=True`: **Crucial**. Obliga a guardar los cambios aunque el "test" inicial sea peor que el del modelo original.
+- `--vocab_size=512`: Usa el diccionario reducido del ESP32.
+- `--learning_rate=5e-4` y `--decay_lr=False`: Mantiene el aprendizaje activo.
+
+---
+
+## 4. Probar el Modelo (Inferencia)
+Nota: Usa guiones bajos `_` para evitar errores en la terminal de Windows.
+```cmd
+python sample.py --checkpoint=out/ckpt.pt --start="Instruction:_Hola_quien_eres?_Response:"
+```
+
+
+
+###### test:
+> train
+```bash
+python train.py --init_from="resume" --vocab_source="custom" --vocab_size=512 --batch_size=1 --gradient_accumulation_steps=16 --max_seq_len=64 --max_new_iters=1000 --eval_interval=5 --learning_rate=5e-4 --decay_lr=False --always_save_checkpoint=True
+```
+
+> test
+```bash
+python sample.py --checkpoint=out/ckpt.pt --start="Instruction: Explícame qué es un átomo. Response: el atomo es "
+```
+
+
+

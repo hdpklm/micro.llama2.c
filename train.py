@@ -60,6 +60,7 @@ dropout = 0.0
 gradient_accumulation_steps = 4  # used to simulate larger batch sizes
 learning_rate = 5e-4  # max learning rate
 max_iters = 100000  # total number of training iterations
+max_new_iters = -1 # if positive, stop after this many new iterations (ignores max_iters)
 weight_decay = 1e-1
 beta1 = 0.9
 beta2 = 0.95
@@ -190,7 +191,8 @@ scaler = torch.cuda.amp.GradScaler(enabled=(dtype == "float16"))
 # optimizer
 optimizer = model.configure_optimizers(weight_decay, learning_rate, (beta1, beta2), device_type)
 if init_from == "resume" and "optimizer" in checkpoint:
-    optimizer.load_state_dict(checkpoint["optimizer"])
+    # optimizer.load_state_dict(checkpoint["optimizer"]) # COMENTADO: Forzamos el uso del nuevo Learning Rate
+    print("Resuming but IGNORING optimizer state to force new learning rate config.")
 checkpoint = None  # free up memory
 
 # compile the model
@@ -226,7 +228,11 @@ def estimate_loss():
     return out
 
 # learning rate decay scheduler (cosine with warmup)
+# learning rate decay scheduler (cosine with warmup)
 def get_lr(it):
+    # If decay is disabled, always return the full learning rate
+    if not decay_lr:
+        return learning_rate
     # 1) linear warmup for warmup_iters steps
     if it < warmup_iters:
         return learning_rate * it / warmup_iters
@@ -337,6 +343,8 @@ while True:
 
     # termination conditions
     if iter_num > max_iters:
+        break
+    if max_new_iters > 0 and local_iter_num >= max_new_iters:
         break
 
 if ddp:

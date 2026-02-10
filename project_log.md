@@ -69,5 +69,29 @@
 - **Éxito**: El script `train.py` ejecutó correctamente un ciclo de entrenamiento (10 iters) usando `stories260K.pt` como base.
 - **Validación**: Se confirmó que el modelo separa los Shards correctamente (el log mostró pérdidas diferentes para train y val).
 
+## 📝 Registro: v1.11 - Guía Definitiva para Modelo 260K (ESP32)
+- **Acción**: Se eliminó toda la información sobre modelos grandes/15M de `project_status.md` para evitar confusiones.
+- **Resultado**: Nueva guía simplificada "Paso a Paso" exclusiva para el modelo 260K.
+- **Probado**: Comandos de entrenamiento verificados en entorno real (`batch_size=1`, `vocab=512`).
+
+## 📝 Registro: v1.12 - Fine-tuning con Aprendizaje Forzado
+- **Fallo Detectado**: Al usar `init_from="resume"`, la tasa de aprendizaje (`lr`) se quedaba en 0.0 porque el modelo base ya había completado sus ciclos.
+- **Corrección 1**: Se modificó `train.py` para ignorar el estado del optimizador guardado en el checkpoint.
+- **Corrección 2**: Se modificó el scheduler `get_lr` para respetar `--decay_lr=False`.
+- **Resultado**: El modelo ahora entrena con `lr=5e-4` constante, permitiendo que aprenda los nuevos datos.
+
+## 📝 Registro: v1.13 - Clarificación de Iteraciones (98k)
+- **Pregunta del Usuario**: "¿Por qué empieza en el 98,000 y termina en el 98,100?"
+- **Causa**: El modelo base `stories260K.pt` ya fue entrenado por 98,000 pasos. Al usar `resume`, el contador continúa desde ahí.
+- **Problema**: Usar `--max_iters=100` fallaba porque 98,000 > 100. El usuario probablemente ajustó a 98,100 manualmente.
+- **Solución**: Se modificó `train.py` para aceptar un nuevo parámetro `--max_new_iters`.
+- **Cambio**: Ahora se puede entrenar por "100 pasos más" usando `--max_new_iters=100`, sin importar en qué número empiece el checkpoint.
+
+## 📝 Registro: v1.14 - Forzar Guardado (Always Save)
+- **Fallo**: El usuario entrenó dos veces pero el modelo no cambiaba y el archivo `ckpt.pt` tenía fecha antigua.
+- **Causa**: Al hacer Fine-Tuning de un modelo muy optimizado (`loss: 0.8`) con datos nuevos, el error inicial sube (`loss: ~2.5+`). El script por defecto solo guarda si mejora el récord anterior (`old_loss > new_loss`).
+- **Solución**: Se añadió `--always_save_checkpoint=True` al comando oficial.
+- **Resultado**: Ahora el modelo guardará el progreso en cada evaluación (cada 5 pasos), asegurando que aprenda los nuevos datos aunque al principio sea "torpe".
+
 # Backup
 *(Aquí se guardarán ideas descartadas o versiones anteriores en el futuro)*
