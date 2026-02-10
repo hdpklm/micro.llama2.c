@@ -27,5 +27,37 @@
 - **Solución**: Se descargó el archivo `tok512.model` en la carpeta `data/`.
 - **Resultado**: Inferencia exitosa con el modelo mini para pruebas.
 
+## 📝 Registro: v1.4 - Dataset de Ejemplo y Fine-tuning
+- **Cambio**: Se creó un dataset de ejemplo (`data/TinyStories_all_data/custom_data.json`) con 10 instrucciones.
+- **Documentación**: Se añadieron los pasos para "Fine-tuning" al `project_status.md`, incluyendo pretokenización y entrenamiento con `--init_from="resume"`.
+- **Razón**: El usuario desea saber cómo preparar sus propios datos para entrenar el modelo antes de llevarlo al ESP32.
+
+## 📝 Registro: v1.5 - Modalidades de Entrenamiento y Cálculo de Tamaño
+- **Añadido**: Explicación en `project_status.md` sobre la diferencia entre refinar (resume) y entrenar desde cero (scratch).
+- **Añadido**: Guía de cálculo de parámetros y peso del modelo para ESP32.
+- **Razón**: El usuario necesita saber cómo configurar el tamaño exacto del modelo y calcular si cabrá en el hardware limitado del ESP32.
+
+## 📝 Registro: v1.6 - Corrección de train.py para CPU
+- **Fallo**: `RuntimeError: Attempting to deserialize object on a CUDA device but torch.cuda.is_available() is False.`
+- **Causa**: 
+    1. `train.py` tenía `device = "cuda"` hardcodeado, lo que forzaba a `torch.load` a buscar una GPU incluso al usar `map_location`.
+    2. Al igual que en `sample.py`, faltaba `weights_only=False` para PyTorch 2.6+.
+- **Solución**: 
+    1. Se hizo dinámica la selección de `device` (CPU/CUDA) y `dtype`.
+    2. Se añadió `weights_only=False` a `torch.load` en `train.py`.
+    3. Se desactivó `compile` por defecto para evitar errores en Windows.
+
+## 📝 Registro: v1.7 - Guía Maestra de Fine-tuning
+- **Documentado**: Se creó la "Guía Maestra de Fine-tuning" en `project_status.md`.
+- **Hallazgo**: El cargador de datos requiere al menos 2 shards binarios para el shuffle; se instruyó duplicar datos si el dataset es pequeño.
+- **Hallazgo**: `configurator.py` rompe la ejecución con espacios en los parámetros de terminal; se recomendó el uso de guiones bajos (`_`).
+- **Ajuste**: Se crearon las carpetas necesarias (`data/tok512/`) para que el entrenamiento encuentre los datos correctamente.
+
+## 📝 Registro: v1.8 - Consolidación de Guía Multimodelo
+- **Documentado**: Se reorganizó `project_status.md` para distinguir claramente entre el modelo de ESP32 (260K) y el grande (15M).
+- **Añadido**: Instrucciones específicas de pretokenización para ambos casos (vocab 512 vs 32000).
+- **Añadido**: Comandos de entrenamiento "desde cero" con parámetros exactos para recrear el tamaño 260K.
+- **Añadido**: Tabla Comparativa de parámetros y requisitos de hardware.
+
 # Backup
 *(Aquí se guardarán ideas descartadas o versiones anteriores en el futuro)*
